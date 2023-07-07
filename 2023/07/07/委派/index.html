@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Hexo | Hexo</title><meta name="author" content="John Doe"><meta name="copyright" content="John Doe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="域内委派：域委派是指将域内用户的权限委派给服务账户，使得服务账户可以用用户权限开展域内活动。注意：域内可以委派的账户有两种，分别是主机账户和服务账户。其中，域用户可以通过注册SPN的方式来成为服务账户注：以下为了书写方便，委派的服务简称服务1，访问的服务简称服务2，即：用户–委派–&gt;服务1–访问–&gt;服务2环境：Windows server 2012  DC            Win">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2023/07/07/%E5%A7%94%E6%B4%BE/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="域内委派：域委派是指将域内用户的权限委派给服务账户，使得服务账户可以用用户权限开展域内活动。注意：域内可以委派的账户有两种，分别是主机账户和服务账户。其中，域用户可以通过注册SPN的方式来成为服务账户注：以下为了书写方便，委派的服务简称服务1，访问的服务简称服务2，即：用户–委派–&gt;服务1–访问–&gt;服务2环境：Windows server 2012  DC            Win">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-07-07T15:41:51.538Z">
+<meta property="article:modified_time" content="2023-07-07T15:42:17.247Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/07/07/%E5%A7%94%E6%B4%BE/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Hexo',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-07-07 23:42:17'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Hexo"><span class="site-name">Hexo</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">无题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-07-07T15:41:51.538Z" title="发表于 2023-07-07 23:41:51">2023-07-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-07-07T15:42:17.247Z" title="更新于 2023-07-07 23:42:17">2023-07-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="域内委派："><a href="#域内委派：" class="headerlink" title="域内委派："></a>域内委派：</h3><p>域委派是指将域内用户的权限委派给服务账户，使得服务账户可以用用户权限开展域内活动。<br>注意：域内可以委派的账户有两种，分别是主机账户和服务账户。其中，域用户可以通过注册SPN的方式来成为服务账户<br>注：以下为了书写方便，委派的服务简称服务1，访问的服务简称服务2，即：<strong>用户</strong>–委派–&gt;<strong>服务1</strong>–访问–&gt;<strong>服务2</strong><br>环境：Windows server 2012  DC<br>            Windows 7 域用户：jack 机器用户：windows7<br>            Windows server 2008 域用户：alice 机器用户：sqlserver</p>
+<h4 id="简述Kerberos："><a href="#简述Kerberos：" class="headerlink" title="简述Kerberos："></a>简述Kerberos：</h4><p>此处为了方便，简化了具体细节以及PAC认证<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887108225-2c0e5a5a-d157-493e-9bd0-f8c8f052e880.png#averageHue=%230d0d0d&id=M3OEb&originHeight=291&originWidth=381&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="></p>
+<h4 id="一-非约束委派："><a href="#一-非约束委派：" class="headerlink" title="一. 非约束委派："></a>一. 非约束委派：</h4><h5 id="介绍："><a href="#介绍：" class="headerlink" title="介绍："></a>介绍：</h5><p>是微软最早使用的委派机制，其提出是为了解决双跳问题（即通过中间机器访问其他服务）<br>当配置了非约束委派之后，代表着服务1可以接受任何用户的委派去访问其他服务。在协议层的实现就是用户将自己的TGT转发给服务1，服务1将其缓存到自己的lsass中，然后模拟用户去请求其他的服务。<br>设置了非约束委派的账户中有个属性<code>userAccountControl</code> 有个flag位<code>TRUSTED_FOR_DELEGATION</code>，而它对应的值为0x80000也就是524288。我们可以以此利用工具来在域内查找相关机器<br>这里以ADFind为例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AdFind.exe  -b dc=redteam,dc=red -f &quot;(&amp;(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))&quot; -dn</span><br></pre></td></tr></table></figure>
+<h5 id="流程图："><a href="#流程图：" class="headerlink" title="流程图："></a>流程图：</h5><p><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887108424-1d3fdc44-9442-40de-8728-3817c9fc4fb1.png#averageHue=%23f3f3f3&id=stRxZ&originHeight=417&originWidth=533&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="></p>
+<h5 id="利用："><a href="#利用：" class="headerlink" title="利用："></a>利用：</h5><p>如果我们拿下了配置非约束委派的机器，我们可以诱导域管账户访问该机器，此时域管账户就会将自己的TGT发送并缓存到机器的lsass中 我们可以通过PTT来获取域管权限，常见方法如<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/11555#toc-7">打印机漏洞</a>等。<br>事实上非约束委派平时的利用情况较少，且主流的利用工具例如打印机漏洞等受限于各种.net环境，很容易出现各种意料之外的情况。</p>
+<h4 id="二-约束委派："><a href="#二-约束委派：" class="headerlink" title="二.约束委派："></a>二.约束委派：</h4><h5 id="介绍：-1"><a href="#介绍：-1" class="headerlink" title="介绍："></a>介绍：</h5><p>微软在很早的时候就意识到非约束委派不是特别安全，于是在Windows2003上发布了约束委派。它由一组拓展协议组成（S4U2Self和S4U2Proxy）配置了约束委派的服务1只能代表用户访问特定的服务2，且此时用户不再发送自己的TGT认证。<br>配置约束委派需要<strong>SeEnableDelegation</strong>权限，该权限很敏感，通常授予域管账户<br><strong>S4U2Self</strong>：负责协议转换 。它允许用户通过Kerberos以外的身份进行认证（例如web、证书），并在用户的身份验证通过之后以自己的名义向KDC请求访问自己的票据（S4U2Self票据），然后响应用户请求。<br><strong>注：此处用户只需要向服务1提供身份认证即可，向KDC请求时只需要提供部分信息即可</strong><br><strong>S4U2Proxy</strong>：负责代理访问。尽管S4U2Self可以达到模拟用户访问，但是此拓展不允许服务1向其他服务申请资源，而S4U2Proxy很好的解决了这个问题。在用户向服务1请求服务2时，服务1利用S4U2Self生成的针对自己的票据来向KDC请求访问服务2的票据，得到返回的票据之后利用票据访问服务2，此时对于服务2来说等同于被用户访问。<br>设置了约束委派的话属性<code>userAccountControl</code> flag位会被设置为<code>TRUSTED_TO_AUTHENTICATE_FOR_DELEGATION</code>对应0x1000000 也就是16777216 ，同时<code>msDS-AllowedToDelegateTo</code>里储存了对哪个spn进行委派</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AdFind.exe  -b dc=redteam,dc=red -f &quot;(&amp;(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=16777216))&quot; -dn</span><br></pre></td></tr></table></figure>
+<h5 id="流程图：-1"><a href="#流程图：-1" class="headerlink" title="流程图："></a>流程图：</h5><p>上半S4U2Self<br>下半S4U2Proxy<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887108585-d2ed2b1e-22c5-46d8-93ca-c5853d93b3be.png#averageHue=%23f7f7f7&id=zLNKh&originHeight=403&originWidth=533&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="></p>
+<h5 id="利用：-1"><a href="#利用：-1" class="headerlink" title="利用："></a>利用：</h5><p>在S4U2Self认证这一步，用户只需要向服务1证明身份而无需访问KDC。因此当我们拿下服务1时，我们可以伪造任意用户来向KDC请求票据，从而以任意用户来访问被配置约束委托的服务2<br>首先为用户账户注册SPN<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887108737-5d7a8bf6-20eb-4147-9497-b06e4bb07a21.png#averageHue=%23090909&id=XTrH3&originHeight=202&originWidth=629&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>然后设置到sqlserver机器的约束委派<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887108947-6a51d009-e0b1-432d-b003-06da4dfea017.png#averageHue=%23f9f8f7&id=RSRbK&originHeight=268&originWidth=636&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>利用kekeo生成域用户可转发的TGT票据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tgt::ask /user:jack /password:jk1234!@# /domain:red.org</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887109453-29643f26-fdbb-4a86-a2ac-ac9f84cdb467.png#averageHue=%230f0f0f&id=sQINo&originHeight=217&originWidth=788&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>利用TGT票据分别伪造两张管理员身份的ST票据<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887109722-cce6eeee-ea72-44a4-8371-09fd67c65d37.png#averageHue=%23131313&id=EMdrV&originHeight=101&originWidth=819&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>我们将伪造的ST票据利用mimikatz导入即可访问被委派的sqlserver机器<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887109936-668708f3-6b4e-44cf-bb2c-d5500c26853d.png#averageHue=%23333332&id=lANoQ&originHeight=681&originWidth=1082&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>我们同样可以利用约束委派来留后门，例如我们配置服务1到域控的约束委派，那么我们可以模拟用户通过服务1来控制域控</p>
+<h4 id="三-基于资源的约束委派："><a href="#三-基于资源的约束委派：" class="headerlink" title="三.基于资源的约束委派："></a>三.基于资源的约束委派：</h4><h5 id="介绍：-2"><a href="#介绍：-2" class="headerlink" title="介绍："></a>介绍：</h5><p>前面提到配置约束委派时必须拥有SeEnableDelegation特权，该特权通常授予域管理员。为了使用户和资源更加独立，微软引入了基于资源的约束委派。<strong>基于资源的约束委派只能在运行 Windows Server 2012 R2 和 Windows Server 2012 及以上的域控制器上配置，但可以在混合模式林中应用。</strong><br>和前面的约束委派过程类似，主要区别在于约束委派在服务1的<code>msDS-AllowedToDelegateTo</code>属性中配置服务2，并定义委派由服务1—&gt;服务2。而基于资源的约束委派则在服务2<code>msDS-AllowedToActOnBehalfOfOtherIdentity</code>属性中配置服务1，定义服务1—&gt;服务2<br>因为基于资源的约束委派仅仅需要修改自身的属性，所以我们<strong>只需要机器用户的修改权限</strong>即可。</p>
+<h5 id="流程图：-2"><a href="#流程图：-2" class="headerlink" title="流程图："></a>流程图：</h5><p><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887110160-8e62a4eb-e98f-48fc-b647-954e1ad426b1.png#averageHue=%23f0f0f0&id=yJ6VW&originHeight=410&originWidth=560&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="></p>
+<h5 id="利用：-2"><a href="#利用：-2" class="headerlink" title="利用："></a>利用：</h5><p>利用方法和约束委派类似，同时更加方便。因为约束委派只能控制固定的机器，而基于资源的约束委派可以控制所有我们拥有修改权限的机器。<br>当我们对目标机器拥有写入权限时就可以尝试攻击该主机<br>我们可以使用PowerView来查询对目标主机的写入权限<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887110426-64e6d536-c343-413a-ad57-42d10f757acd.png#averageHue=%23032658&id=lZ0Lp&originHeight=409&originWidth=1005&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>刚好可以看到存在GenericWrite权限，前面说到设置委派的必须是机器账户和服务账户，而给用户账户申请SPN又需要一定的权限，所以我们选择利用当前用户账户注册计算机用户（每个用户账户可以注册10个机器账户）<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887111369-e3a247f4-52e2-4f3c-88d3-b1dc06ddfa1f.png#averageHue=%23042659&id=lvipe&originHeight=135&originWidth=716&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>然后我们利用PowerView修改目标机器的<code>msDS-AllowedToActOnBehalfOfOtherIdentity</code>属性值，来配置基于资源的约束委派<br><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887111560-41f117ec-044e-47ba-970b-a789b71fd97f.png#averageHue=%23263636&id=gn2Fw&originHeight=212&originWidth=1274&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>然后我们利用Rubeus来进行后续攻击，注：Rubeus需要自行编译，且编译时.NET的版本不能过高（作者默认3.5）否则win7和Windows server2008会报版本错。<br>Rubeus不支持明文，所以我们先将其转化为RC4加密的hash</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./Rubeus.exe hash /user:WINTEST /password:root /domain:red.org</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887111837-f5d63b75-b9bc-426a-b896-4f6eb8381be9.png#averageHue=%230c0c0c&id=mZIol&originHeight=371&originWidth=652&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>然后利用Rubeus请求当前账号的ST并导入当前会话</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./Rubeus.exe s4u /user:WINTEST<span class="variable">$</span> /rc4:<span class="number">329153</span>F560EB329C0E1DEEA55E88A1E9  /impersonateuser:administrator /msdsspn:cifs/windows7.red.org /ptt</span><br></pre></td></tr></table></figure>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/25946722/1672887112048-f3ec2df1-b9ea-4e46-87df-9d9fb0584f8e.png#averageHue=%23cacccd&id=madcV&originHeight=636&originWidth=1438&originalType=binary&ratio=1&rotation=0&showTitle=false&status=done&style=none&title="><br>注：命令最后主机域名一定不能省略，省略了请求也会成功但是不能访问</p>
+<ul>
+<li>域内批量攻击</li>
+</ul>
+<p>参考文档：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1899592">https://cloud.tencent.com/developer/article/1899592</a><br>          <a target="_blank" rel="noopener" href="https://skewwg.github.io/2020/11/25/ji-yu-zi-yuan-de-yue-shu-wei-pai-li-yong/">https://skewwg.github.io/2020/11/25/ji-yu-zi-yuan-de-yue-shu-wei-pai-li-yong/</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">John Doe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/07/07/%E5%A7%94%E6%B4%BE/">http://example.com/2023/07/07/%E5%A7%94%E6%B4%BE/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Hexo</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/07/06/%E8%A7%A3%E6%9E%90PEB/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info"></div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">John Doe</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%9F%E5%86%85%E5%A7%94%E6%B4%BE%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">域内委派：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E8%BF%B0Kerberos%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">简述Kerberos：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80-%E9%9D%9E%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">一. 非约束委派：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">介绍：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE%EF%BC%9A"><span class="toc-number">1.2.2.</span> <span class="toc-text">流程图：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">利用：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">二.约束委派：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D%EF%BC%9A-1"><span class="toc-number">1.3.1.</span> <span class="toc-text">介绍：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE%EF%BC%9A-1"><span class="toc-number">1.3.2.</span> <span class="toc-text">流程图：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%EF%BC%9A-1"><span class="toc-number">1.3.3.</span> <span class="toc-text">利用：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89-%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">三.基于资源的约束委派：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D%EF%BC%9A-2"><span class="toc-number">1.4.1.</span> <span class="toc-text">介绍：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E5%9B%BE%EF%BC%9A-2"><span class="toc-number">1.4.2.</span> <span class="toc-text">流程图：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%EF%BC%9A-2"><span class="toc-number">1.4.3.</span> <span class="toc-text">利用：</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/07/%E5%A7%94%E6%B4%BE/" title="无题">无题</a><time datetime="2023-07-07T15:41:51.538Z" title="发表于 2023-07-07 23:41:51">2023-07-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/06/%E8%A7%A3%E6%9E%90PEB/" title="无题">无题</a><time datetime="2023-07-06T15:00:30.729Z" title="发表于 2023-07-06 23:00:30">2023-07-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/07/06/hello-world/" title="Hello World">Hello World</a><time datetime="2023-07-06T13:45:42.243Z" title="发表于 2023-07-06 21:45:42">2023-07-06</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By John Doe</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

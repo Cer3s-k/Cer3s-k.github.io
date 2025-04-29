@@ -1,168 +1,205 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>滥用ADCS进行权限提升——ESC13详解 | Cer3sの博客</title><meta name="author" content="Cer3s"><meta name="copyright" content="Cer3s"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="本文首发于先知社区：https:&#x2F;&#x2F;xz.aliyun.com&#x2F;t&#x2F;13864 0x1 起因：​       自 Will Schroeder（@harmj0y）和 Lee Christensen（@tifkin_）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。Certified Pre-Owned - Abusing Active Dir">
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="本文首发于先知社区：https:&#x2F;&#x2F;xz.aliyun.com&#x2F;t&#x2F;13864 0x1 起因：​       自 Will Schroeder（@harmj0y）和 Lee Christensen（@tifkin_）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。Certified Pre-Owned - Abusing Active Dir">
 <meta property="og:type" content="article">
 <meta property="og:title" content="滥用ADCS进行权限提升——ESC13详解">
 <meta property="og:url" content="https://cer3s-k.github.io/post/48e6280e.html">
 <meta property="og:site_name" content="Cer3sの博客">
 <meta property="og:description" content="本文首发于先知社区：https:&#x2F;&#x2F;xz.aliyun.com&#x2F;t&#x2F;13864 0x1 起因：​       自 Will Schroeder（@harmj0y）和 Lee Christensen（@tifkin_）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。Certified Pre-Owned - Abusing Active Dir">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cer3s-k.github.io/image/9e5d.jpg">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144636132.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144648367.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144656542.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144703128.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144710141.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144715770.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144720831.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144727176.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144738676.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144751089.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144756431.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144802852.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144806915.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144812103.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144817366.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144824808.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144832095.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144859596.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144908853.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144914080.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144920658.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144925847.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144931174.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144936230.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144955762.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145000881.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145005809.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145011317.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145015729.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145020565.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145026443.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145031926.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145036415.png">
 <meta property="article:published_time" content="2024-03-02T06:23:30.000Z">
-<meta property="article:modified_time" content="2024-03-02T06:50:40.362Z">
+<meta property="article:modified_time" content="2024-09-22T11:00:30.242Z">
 <meta property="article:author" content="Cer3s">
 <meta property="article:tag" content="ADCS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cer3s-k.github.io/image/9e5d.jpg"><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://cer3s-k.github.io/post/48e6280e.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: '复制成功',
-    error: '复制错误',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '天',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  source: {
-    justifiedGallery: {
-      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
-      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
-    }
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '滥用ADCS进行权限提升——ESC13详解',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  postUpdate: '2024-03-02 14:50:40'
-}</script><noscript><style type="text/css">
-  #nav {
-    opacity: 1
-  }
-  .justified-gallery img {
-    opacity: 1
-  }
-
-  #recent-posts time,
-  #post-meta time {
-    display: inline !important
-  }
-</style></noscript><script>(win=>{
-    win.saveToLocal = {
-      set: function setWithExpiry(key, value, ttl) {
-        if (ttl === 0) return
-        const now = new Date()
-        const expiryDay = ttl * 86400000
-        const item = {
-          value: value,
-          expiry: now.getTime() + expiryDay,
-        }
-        localStorage.setItem(key, JSON.stringify(item))
-      },
-
-      get: function getWithExpiry(key) {
-        const itemStr = localStorage.getItem(key)
-
-        if (!itemStr) {
-          return undefined
-        }
-        const item = JSON.parse(itemStr)
-        const now = new Date()
-
-        if (now.getTime() > item.expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return item.value
-      }
-    }
-  
-    win.getScript = url => new Promise((resolve, reject) => {
-      const script = document.createElement('script')
-      script.src = url
-      script.async = true
-      script.onerror = reject
-      script.onload = script.onreadystatechange = function() {
-        const loadState = this.readyState
-        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-        script.onload = script.onreadystatechange = null
-        resolve()
-      }
-      document.head.appendChild(script)
-    })
-  
-    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = url
-      if (id) link.id = id
-      link.onerror = reject
-      link.onload = link.onreadystatechange = function() {
-        const loadState = this.readyState
-        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-        link.onload = link.onreadystatechange = null
-        resolve()
-      }
-      document.head.appendChild(link)
-    })
-  
-      win.activateDarkMode = function () {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      win.activateLightMode = function () {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
-        }
-      }
-      const t = saveToLocal.get('theme')
+<meta name="twitter:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302144636132.png">
     
-          if (t === 'dark') activateDarkMode()
-          else if (t === 'light') activateLightMode()
+    
+      
         
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
     
-    const detectApple = () => {
-      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-        document.documentElement.classList.add('apple')
-      }
-    }
-    detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/image/Avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/image/9e5d.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Cer3sの博客"><span class="site-name">Cer3sの博客</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">滥用ADCS进行权限提升——ESC13详解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-03-02T06:23:30.000Z" title="发表于 2024-03-02 14:23:30">2024-03-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-02T06:50:40.362Z" title="更新于 2024-03-02 14:50:40">2024-03-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AD%E5%9F%9F/">AD域</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="滥用ADCS进行权限提升——ESC13详解"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/post/48e6280e.html#post-comment"><span class="waline-comment-count" data-path="/post/48e6280e.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本文首发于先知社区：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/13864">https://xz.aliyun.com/t/13864</a></p>
+    <!-- title -->
+    <title>滥用ADCS进行权限提升——ESC13详解</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/post/db27253d.html"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/48e6280e.html"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升——ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升——ESC13详解&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x1-%E8%B5%B7%E5%9B%A0%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">0x1 起因：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x2-%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">0x2 分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E9%A2%81%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">2.1.</span> <span class="toc-text">证书颁发策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OID%E7%BB%84%E9%93%BE%E6%8E%A5"><span class="toc-number">2.2.</span> <span class="toc-text">OID组链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">证书认证：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x3-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">0x3 漏洞复现：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x4-%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">0x4 总结：</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        滥用ADCS进行权限提升——ESC13详解
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Cer3s</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-03-02T06:23:30.000Z" class="dt-published" itemprop="datePublished">2024-03-02</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/AD%E5%9F%9F/">AD域</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/ADCS/" rel="tag">ADCS</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>本文首发于先知社区：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/13864">https://xz.aliyun.com/t/13864</a></p>
 <h2 id="0x1-起因："><a href="#0x1-起因：" class="headerlink" title="0x1 起因："></a>0x1 起因：</h2><p>​       自 Will Schroeder（<a target="_blank" rel="noopener" href="https://twitter.com/harmj0y">@harmj0y</a>）和 Lee Christensen（<a target="_blank" rel="noopener" href="https://twitter.com/tifkin_">@tifkin_</a>）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。<a target="_blank" rel="noopener" href="https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf">Certified Pre-Owned - Abusing Active Directory Certificate Services</a>这本白皮书可以说是为ADCS的利用奠定了各种理论基础。<br>​       随着ADCS的利用越加广泛，各种工具层出不穷，其中Certipy更是其中的佼佼者，近日在学习Certipy的相关代码实现的时候，偶然发现了这样一条PR</p>
 <img src="/post/48e6280e/image-20240302144636132.png" class="" title="image-20240302144636132">
 <p>众所周知（应该），在白皮书中一共介绍了ESC1-ESC8这8种ESC命名的攻击手法，后续又补充了<a target="_blank" rel="noopener" href="https://medium.com/u/cd3a881c1abc?source=post_page-----fda4272fbd53--------------------------------">Oliver Lyak</a>提出的<a target="_blank" rel="noopener" href="https://research.ifcr.dk/certipy-4-0-esc9-esc10-bloodhound-gui-new-authentication-and-request-methods-and-more-7237d88061f7">ESC9和ESC10</a>、 <a target="_blank" rel="noopener" href="https://twitter.com/sploutchy">Sylvain Heiniger</a>提出的中继到RPC的 <a target="_blank" rel="noopener" href="https://blog.compass-security.com/2022/11/relaying-to-ad-certificate-services-over-rpc/">ESC11</a>和利用条件比较局限的的<a target="_blank" rel="noopener" href="https://pkiblog.knobloch.info/esc12-shell-access-to-adcs-ca-with-yubihsm">ESC12</a>，针对这条PR附带的<a target="_blank" rel="noopener" href="https://posts.specterops.io/adcs-esc13-abuse-technique-fda4272fbd53">博客文章</a>，我尝试对这个ESC13进行分析和复现。</p>
@@ -188,7 +225,7 @@
 <img src="/post/48e6280e/image-20240302144715770.png" class="" title="image-20240302144715770">
 
 <h3 id="OID组链接"><a href="#OID组链接" class="headerlink" title="OID组链接"></a>OID组链接</h3><p>对应CN&#x3D;OID这个容器，我们可以看到它是一个<code>msPKI-Enterprise-Oid</code>类，而对于这个类，它存在一个继承 的<code>msDS-OIDToGroupLink</code>属性</p>
-<img src="/post/48e6280e/image-20240302144720831.png" class="" title="image-20240302144720831"><img src="/post/48e6280e/image-20240302144727176.png" class="" title="image.png](https:&#x2F;&#x2F;cdn.n![image-20240302144727176">
+<img src="/post/48e6280e/image-20240302144720831.png" class="" title="image-20240302144720831"><img src="/post/48e6280e/image-20240302144727176.png" class="" title="image-20240302144727176">
 <p><code>msDS-OIDToGroupLink</code>这个属性便是ESC13的关键，它标识了与该 OID 表示的发布策略对应的组对象。换句话说，我们可以利用这个属性将我们的颁发策略和相应的AD组链接起来，如果用户利用带有相关颁发策略的证书进行身份验证，那么系统将认为该用户作为AD组的成员（用户不在该组中)，并授予相应的权限。</p>
 <img src="/post/48e6280e/image-20240302144738676.png" class="" title="image-20240302144738676">
 <p>但是并不是任何组都可以被颁发策略链接的，它需要满足以下要求</p>
@@ -258,31 +295,148 @@
 <img src="/post/48e6280e/image-20240302145036415.png" class="" title="image-20240302145036415">
 
 <h2 id="0x4-总结："><a href="#0x4-总结：" class="headerlink" title="0x4 总结："></a>0x4 总结：</h2><p>感觉这个利用属于是”可遇而不可求“，感觉利用限制很多，而且获取的还不一定是高权限组的权限，不过我们可以配合其他漏洞，例如ESC5来修改PKI的ACL等。本篇文章只是暂时分析了一下成因及其简单利用，后续有其他利用姿势欢迎大佬补充，文章有什么错误也欢迎大佬斧正。</p>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">Cer3s</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://cer3s-k.github.io/post/48e6280e.html">https://cer3s-k.github.io/post/48e6280e.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://cer3s-k.github.io" target="_blank">Cer3sの博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ADCS/">ADCS</a></div><div class="post_share"><div class="social-share" data-image="/image/9e5d.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/post/db27253d.html" title="解析PEB"><img class="cover" src="/image/jxpeb.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析PEB</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="waline-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/image/Avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cer3s</div><div class="author-info__description">半溪明月，一枕清风</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Cer3s-k"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Cer3s-k" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">记录生活、记录学习，记录自己曾经的过往。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x1-%E8%B5%B7%E5%9B%A0%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">0x1 起因：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x2-%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">0x2 分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E9%A2%81%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">2.1.</span> <span class="toc-text">证书颁发策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OID%E7%BB%84%E9%93%BE%E6%8E%A5"><span class="toc-number">2.2.</span> <span class="toc-text">OID组链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">证书认证：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x3-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">0x3 漏洞复现：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x4-%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">0x4 总结：</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/post/48e6280e.html" title="滥用ADCS进行权限提升——ESC13详解"><img src="/image/9e5d.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="滥用ADCS进行权限提升——ESC13详解"/></a><div class="content"><a class="title" href="/post/48e6280e.html" title="滥用ADCS进行权限提升——ESC13详解">滥用ADCS进行权限提升——ESC13详解</a><time datetime="2024-03-02T06:23:30.000Z" title="发表于 2024-03-02 14:23:30">2024-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/post/db27253d.html" title="解析PEB"><img src="/image/jxpeb.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="解析PEB"/></a><div class="content"><a class="title" href="/post/db27253d.html" title="解析PEB">解析PEB</a><time datetime="2023-07-06T07:07:21.000Z" title="发表于 2023-07-06 15:07:21">2023-07-06</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/image/9e5d.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024  <i id="heartbeat" class="fa fas fa-heartbeat"></i> Cer3s</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">毕竟几人真得鹿，不知终日梦为鱼<p><a target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a>&nbsp;<a target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a>&nbsp;<a target="_blank" href="https://vercel.com/ "></a>&nbsp;<a target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a>&nbsp;<a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div><link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/HCLonely/images@master/others/heartbeat.min.css"></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadWaline () {
-  function initWaline () {
-    const waline = Waline.init(Object.assign({
-      el: '#waline-wrap',
-      serverURL: 'https://waline.cer3s.xyz/',
-      pageview: false,
-      dark: 'html[data-theme="dark"]',
-      path: window.location.pathname,
-      comment: true,
-    }, null))
-  }
 
-  if (typeof Waline === 'object') initWaline()
-  else {
-    getCSS('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.css').then(() => {
-      getScript('https://cdn.jsdelivr.net/npm/@waline/client/dist/waline.min.js').then(initWaline)
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x1-%E8%B5%B7%E5%9B%A0%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">0x1 起因：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x2-%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">0x2 分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E9%A2%81%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">2.1.</span> <span class="toc-text">证书颁发策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#OID%E7%BB%84%E9%93%BE%E6%8E%A5"><span class="toc-number">2.2.</span> <span class="toc-text">OID组链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">证书认证：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x3-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">0x3 漏洞复现：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">3.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x4-%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">0x4 总结：</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/48e6280e.html"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升——ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升——ESC13详解&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Cer3s
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
     })
-  }
-}
+  })
+  </script>
 
-if ('Waline' === 'Waline' || !false) {
-  if (false) btf.loadComment(document.getElementById('waline-wrap'),loadWaline)
-  else setTimeout(loadWaline, 0)
-} else {
-  function loadOtherComment () {
-    loadWaline()
-  }
-}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

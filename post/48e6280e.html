@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="description" content="本文首发于先知社区：https:&#x2F;&#x2F;xz.aliyun.com&#x2F;t&#x2F;13864 0x1 起因：​       自 Will Schroeder（@harmj0y）和 Lee Christensen（@tifkin_）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。Certified Pre-Owned - Abusing Active Dir">
 <meta property="og:type" content="article">
-<meta property="og:title" content="滥用ADCS进行权限提升——ESC13详解">
+<meta property="og:title" content="滥用ADCS进行权限提升—ESC13详解">
 <meta property="og:url" content="https://cer3s-k.github.io/post/48e6280e.html">
 <meta property="og:site_name" content="Cer3sの博客">
 <meta property="og:description" content="本文首发于先知社区：https:&#x2F;&#x2F;xz.aliyun.com&#x2F;t&#x2F;13864 0x1 起因：​       自 Will Schroeder（@harmj0y）和 Lee Christensen（@tifkin_）在 2021 年的 BlackHat 大会上发布白皮书以来，ADCS的攻击面首次系统化的进入人们的视野。Certified Pre-Owned - Abusing Active Dir">
@@ -47,7 +47,7 @@
 <meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145031926.png">
 <meta property="og:image" content="https://cer3s-k.github.io/post/48e6280e/image-20240302145036415.png">
 <meta property="article:published_time" content="2024-03-02T06:23:30.000Z">
-<meta property="article:modified_time" content="2025-04-30T08:26:37.160Z">
+<meta property="article:modified_time" content="2025-06-14T10:33:27.804Z">
 <meta property="article:author" content="Cer3s">
 <meta property="article:tag" content="AD域">
 <meta property="article:tag" content="ADCS">
@@ -72,7 +72,7 @@
       
     
     <!-- title -->
-    <title>滥用ADCS进行权限提升——ESC13详解</title>
+    <title>滥用ADCS进行权限提升—ESC13详解</title>
     <!-- async scripts -->
     <!-- Google Analytics -->
 
@@ -138,16 +138,16 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/48e6280e.html"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升——ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升——ESC13详解&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升—ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升—ESC13详解&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -167,7 +167,7 @@
   <header>
     
     <h1 class="posttitle p-name" itemprop="name headline">
-        滥用ADCS进行权限提升——ESC13详解
+        滥用ADCS进行权限提升—ESC13详解
     </h1>
 
 
@@ -338,16 +338,16 @@
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/48e6280e.html"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升——ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升——ESC13详解&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升——ESC13详解"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/48e6280e.html&text=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/48e6280e.html&is_video=false&description=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=滥用ADCS进行权限提升—ESC13详解&body=Check out this article: https://cer3s-k.github.io/post/48e6280e.html"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/48e6280e.html&title=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/48e6280e.html&name=滥用ADCS进行权限提升—ESC13详解&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/48e6280e.html&t=滥用ADCS进行权限提升—ESC13详解"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>

